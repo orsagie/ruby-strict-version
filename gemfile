@@ -1,0 +1,218 @@
+source 'https://rubygems.org/'
+
+#ruby-gemset=gui
+ruby "2.1.4"
+
+################################################################################
+# Core Operational CLI Tools
+################################################################################
+gem 'foreman', require: false, groups: [:development, :demo, :stage, :production]
+gem 'unicorn', require: false, groups: [:server]
+gem 'bundler'
+gem 'dotenv', '0.10.0'
+gem 'rack-git_sha'
+
+################################################################################
+# Basic Infrastructure
+################################################################################
+gem 'rails', '3.2.21'
+gem 'yajl-ruby'
+gem 'inherited_resources'
+gem 'rfc822', '~> 0.1.5'
+gem 'rack-timeout'
+
+################################################################################
+# Pry (In all groups so we can use pry in all environments)
+################################################################################
+gem 'pry-rails'
+gem 'pry-byebug'
+
+################################################################################
+# Data Access
+################################################################################
+gem 'mysql2',         '0.3.21'
+gem 'makara', git: 'git://github.com/cloudability/makara.git', groups: [:development, :dev, :demo, :stage, :production]
+gem 'composite_primary_keys'
+gem 'transaction_isolation'
+gem 'transaction_retry'
+
+# Write Zip archives for exporting CSVs of compare reports and widgets.
+# If your local dev environment does not want to bundle install because of a rubyzip
+# collision with axlsx and/or roo requiring 0.9, bundle update those two gems and then
+# you should be able to bundle install just fine. For the same reason, until axlsx is
+# updated past 2.0.1, we cannot move rubyzip beyond 1.1.0.
+gem 'rubyzip', '1.1.0'
+# Some other gems have rubyzip 0.9.9 as a dependency, so this gets them that too.
+gem 'zip-zip'
+# Write xls file for exporting RI actions
+gem 'axlsx'
+# Read xls file after exporting
+gem 'roo', groups: [:test]
+
+# NOTE: Do NOT upgrade to 1.x. Their use of sprocs in new versions is
+# problematic for us.
+gem 'upsert', '~> 0.5.0'
+
+# Integration with third parties
+gem 'stripe'
+
+gem "lograge"
+################################################################################
+# Asset Pipeline
+################################################################################
+# Gems used only for asset compilation and not required in production
+# environments by default.
+group :assets do
+  gem 'coffee-rails', '~> 3.2.1'
+  gem 'uglifier'
+  gem 'jquery-rails'
+  gem 'jquery-ui-rails'
+  gem 'yui-compressor'
+  gem 'zeroclipboard-rails'
+  gem 'compass-rails' # Needed by goddamn Zurb Foundation.  BAH!
+  gem 'turbo-sprockets-rails3'
+end
+
+gem 'asset_sync', '1.1.0'
+gem 'zurb-foundation',        groups: [:server, :assets]
+gem 'sass-rails', '~> 3.2.3', groups: [:server, :assets, :test]
+
+# Sass is already a dependency of sass-rails, but pinning at 3.2.7 to play nicely
+# with ruby 2 and foundation. Make sure pages still load in browser if you mess with
+# the sass version
+gem 'sass', '3.2.7'
+gem 'ejs', git: 'git://github.com/cloudability/ruby-ejs.git', groups: [:server]
+
+gem "statsd-ruby", require: "statsd"
+gem 'analytics-ruby', '~>1.0' # by segment.io
+gem 'orchestrate'
+
+# Allows inlining stylesheets in HTML email
+gem "roadie"
+
+gem 'jwt'
+gem 'airbrake'
+gem 'recaptcha', :require => 'recaptcha/rails'
+
+################################################################################
+# Production Environment (Mostly Monitoring-Related)
+################################################################################
+group :production do
+  gem 'girl_friday' # Airbrake needs this, but isn't loading it properly..
+  gem 'secure_headers'
+end
+
+################################################################################
+# DISTRIBUTE ALL THE THINGS!
+################################################################################
+# Job queue:
+gem 'resque'
+gem 'resque-cleaner',         require: false, groups: [:server]
+gem 'resque-scheduler'
+gem 'resque-pause'
+gem 'resque-loner'
+gem 'resque-superman'
+gem 'resque-multi-job-forks', require: false,                    git: 'git://github.com/groupme/resque-multi-job-forks.git'
+gem 'resque-metrics'
+
+# Bill archive:
+gem 'aws-sdk-v1', '~> 1.1'
+gem 'aws-sdk-marketplaceentitlementservice', '~> 1'
+gem 'aws-sdk-marketplacemetering', '~> 1'
+
+# Caching for our data pipeline.
+gem 'dalli', git: 'https://github.com/cloudability/dalli.git'
+
+gem 'money',                  git: 'https://github.com/cloudability/money.git'
+gem 'state_machine'
+
+# HTTP client tool, used for server-to-server OAuth transactions:
+gem 'curb'
+gem 'httparty'
+
+# We nest things here.
+gem 'awesome_nested_set'
+
+################################################################################
+# Authentication / Access Control.
+################################################################################
+gem 'devise', '~> 2.2.0'
+gem 'cancan', '~> 1.6.1'
+
+# Natural language time parsing for handling relative report times
+gem "chronic"
+
+# OpenID
+gem 'omniauth'
+gem 'omniauth-openid'
+gem 'openid_active_record_store'
+
+# bitly (cldy.co)
+gem "bitly-oauth", "~> 0.2.3"
+
+# saml integration
+gem "omniauth-saml"
+
+################################################################################
+# Stuff related to administration/management.
+################################################################################
+# Admin UI -- scaffolds / infrastructure.
+gem 'activeadmin'
+
+# ActiveAdmin MFA - Google Authenticator
+gem 'devise_google_authenticator-cloudability', require: 'devise_google_authenticator'
+
+################################################################################
+# API Infrastructure
+################################################################################
+gem 'grape'
+gem 'grape-entity'
+
+gem 'json_extractor'
+
+group :development do
+  gem 'mailcatcher',          require: false
+  gem 'quiet_assets'
+  gem 'heroku',               require: false
+  gem 'fog',                  require: false
+end
+
+gem 'kss', groups: [:development, :demo, :test, :stage]
+
+group :test do
+  ################################################################################
+  # Testing Infrastructure
+  ################################################################################
+  gem 'shoulda'
+  gem 'shoulda-matchers',                                                                require: false
+  gem 'konacha', '~> 1.5'
+  gem 'rack-test',                                                                       require: false
+  gem 'http_spec'
+  gem 'rspec-rails'
+  gem 'timecop',                                                                         require: false
+  gem 'email_spec',                                                                      require: false
+  gem 'database_cleaner',                                                                require: false
+  gem 'webmock',                                                                         require: false
+  gem 'faker', '= 1.0.1'
+  gem 'fakeredis'
+  gem 'rspec_junit_formatter', '0.2.2'
+  gem 'vcr',                                                                             require: false
+
+  gem 'resque_spec'
+  ################################################################################
+  # Code Quality
+  ################################################################################
+  gem 'simplecov',                                                                       require: false
+
+  ################################################################################
+  # Misc
+  ################################################################################
+  gem "parallel_tests"
+  gem 'fuubar'
+end
+
+group :test, :development do
+  gem 'factory_girl',       git: 'https://github.com/thoughtbot/factory_girl.git'
+  gem 'factory_girl_rails', git: 'https://github.com/thoughtbot/factory_girl_rails.git', require: false
+end
+
